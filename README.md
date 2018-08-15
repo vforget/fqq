@@ -2,6 +2,14 @@
 
 Depends: `data.table` and `Rmpfr`.
 
+
+Features:
+
+ * Over 10x faster that plotting all the points.
+ * Support p-values less than default floating point limit of ~1e-323.
+
+**IMPORTANT**: This is a close approximation of a QQ plot that contains all the data. Using a sub-sample of ~20,000 points on a dataset of 14,000,000 p-values results in a farily accurate approximation ie, shape of curve, and count of extreme p-values.
+
 Usage:
 
     fqq.R p.txt 20000 "some title"
