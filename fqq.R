@@ -1,6 +1,6 @@
 #!/usr/bin/Rscript
 
-fqq <- function(pv, title="QQ plot", NSS=20000){
+fqq <- function(pv, p.m=0.01, p.e=0.01, type="fast"){
 
     quant.subsample <- function(y, m=100, e=1){
         ## Adapted from https://stats.stackexchange.com/a/35264/53539
@@ -9,7 +9,7 @@ fqq <- function(pv, title="QQ plot", NSS=20000){
         x <- sort(y)
         n <- length(x)
         quants <- (1 + sin(1:m / (m+1) * pi - pi/2))/2
-        sort(c(x[1:e], quantile(x, probs=quants), x[(n+1-e):n]))
+        sort(c(x[1:e], quantile(x[e:(n+1-e)], probs=quants), x[(n+1-e):n]))
         ## Returns m + 2*e sorted values from the EDF of y
     }
 
@@ -34,13 +34,13 @@ fqq <- function(pv, title="QQ plot", NSS=20000){
     
     message("Subsampling >> ", appendLF=FALSE)
     ## Adapted from https://stats.stackexchange.com/q/357952/53539
-    mr <- NSS / length(lp$x)
-    m <- mr * length(lp$x)
-    er <- NSS / length(lp$x)
-    e <- floor(er * length(lp$x))
-
-    xy <- list(x=quant.subsample(lp$x, m, e), y=quant.subsample(lp$y, m, e))
-    
+    m <- p.m * length(lp$x)
+    e <- floor(p.e * length(lp$x))
+    if (type=="fast"){
+        xy <- list(x=quant.subsample(lp$x, m, e), y=quant.subsample(lp$y, m, e))
+    }else{
+        xy <- list(x=sort(lp$x), y=sort(lp$y))
+    }
     message("Confidence intervals >> ", appendLF=FALSE)
     ## Adapted from https://raw.githubusercontent.com/YinLiLin/R-MVP/master/R/MVP.Report.r
     N <- length(y)
@@ -57,15 +57,14 @@ fqq <- function(pv, title="QQ plot", NSS=20000){
     }
     index=length(c95):1
     
-    message("Drawring plot >> ", appendLF=FALSE)
+    message("Drawring plot ",length(xy$y)," >> ", appendLF=FALSE)
   
     par(mar=c(5,5,5,2))
-    plot(-1,-1,
+    plot(NULL,
          xlim=range(xy$x),
          ylim=range(xy$y),
          xlab=expression(Expected~~-log[10](italic(p))),
-         ylab=expression(Observed~~-log[10](italic(p))),
-         main=title)
+         ylab=expression(Observed~~-log[10](italic(p))))
     polygon(c(-log10(R[index]),-log10(R)),c(-log10(c05[index]),-log10(c95)),col="#73737333",border="#73737333")
     abline(0,1,col=2)
     points(xy$x,xy$y, cex=1, pch=21, bg="#0000ff33", col="#0000ff")
@@ -81,16 +80,15 @@ library(Rmpfr)
 
 args <- commandArgs(trailingOnly = TRUE)
 p.f = args[1]
-NSS = as.numeric(args[2])
-title = args[3]
+p.m = as.numeric(args[2])
+p.e = as.numeric(args[3])
 qq.f = paste(p.f, ".qq.png", sep="")
 
 message("Loading data >> ", appendLF=FALSE)
 DT <- fread(p.f, header=TRUE)
 
 png(file=qq.f, res=300, height = 2000, width = 2000)
-fqq(DT$P, title=title, NSS=NSS)
+fqq(DT$P, p.m=p.m, p.e=p.e)
 invisible(dev.off())
 
 message("Done.")
-
