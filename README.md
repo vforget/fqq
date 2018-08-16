@@ -17,7 +17,7 @@ Where arguments are:
 
  1. `<txt>`: Text file containing a column labeled P with p-values. For fast loading have the file contain only this column.
  2. `<p.m>`: The proportion of points to subsample from the QQ plot. Default to sub-sample 0.1% of p-value distribution, excluding the tails (see next point).
- 3. `<p.e>`: Cutoff to select points as being in the tails. Default to include the top and bottom 1% of the p-value distribution.
+ 3. `<p.e>`: Cutoff to select points as being in the tails to plot. Default to include the top and bottom 1% of the p-value distribution into the plot.
 
 Example command:
 
