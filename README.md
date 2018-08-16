@@ -16,13 +16,13 @@ Usage:
 Where arguments are:
 
  1. `<txt>`: Text file containing a column labeled P with p-values. For fast loading have the file contain only this column.
- 2. `<p.m>`: The proportion of points to subsample from the QQ plot (excluding tails).
- 3. `<p.e>`: The proportion of points to include from tails into the plot.
-
-Example data:
-
-    > write.table(data.frame(P=runif(2000000,0,1)), file="p.txt", row.names=FALSE, quote=FALSE)
+ 2. `<p.m>`: The proportion of points to subsample from the QQ plot. Default to sub-sample 0.1% of p-value distribution, excluding the tails (see next point).
+ 3. `<p.e>`: Cutoff to select points as being in the tails. Default to include the top and bottom 1% of the p-value distribution.
 
 Example command:
 
     fqq.R p.txt 0.001 0.01
+
+Example data:
+
+    > write.table(data.frame(P=runif(2000000,0,1)), file="p.txt", row.names=FALSE, quote=FALSE)
