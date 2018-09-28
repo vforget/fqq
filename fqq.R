@@ -85,11 +85,8 @@ library(Rmpfr)
 args <- commandArgs(trailingOnly = TRUE)
 
 p.f = args[1]
-#p.m = as.numeric(args[2])
-#p.e = as.numeric(args[3])
-
-p.m = 0.001
-p.e = 0.01
+p.m = as.numeric(args[2])
+p.e = as.numeric(args[3])
 
 qq.f = paste(p.f, ".qq.png", sep="")
 
