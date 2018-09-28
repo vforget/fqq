@@ -1,18 +1,22 @@
 #!/usr/bin/Rscript
 
-fqq <- function(pv, p.m=0.01, p.e=0.01, type="fast"){
+quant.subsample <- function(x, m=100, e=1){
+  ## Adapted from https://stats.stackexchange.com/a/35264/53539
+  ## m: size of a systematic sample
+  ## e: number of extreme values at either end to use
+  #x <- sort(y)
+  n <- length(x)
+  quants <- (1 + sin(1:m / (m+1) * pi - pi/2))/2
+  sort(c(x[1:e], quantile(x[e:(n+1-e)], probs=quants), x[(n+1-e):n]))
+  #sort(c(quantile(x[2:(n+1-e)], probs=quants), x[(n+1-e):n]))
+  
+  ## Returns m + 2*e sorted values from the EDF of y
+}
 
-    quant.subsample <- function(y, m=100, e=1){
-        ## Adapted from https://stats.stackexchange.com/a/35264/53539
-        ## m: size of a systematic sample
-        ## e: number of extreme values at either end to use
-        x <- sort(y)
-        n <- length(x)
-        quants <- (1 + sin(1:m / (m+1) * pi - pi/2))/2
-        sort(c(x[1:e], quantile(x[e:(n+1-e)], probs=quants), x[(n+1-e):n]))
-        ## Returns m + 2*e sorted values from the EDF of y
-    }
 
+fqq <- function(pv, p.m=0.001, p.e=0.01, type="fast"){
+
+    
     
     message("Cleaning data [", appendLF=FALSE)
     message(length(pv), " > ", appendLF=FALSE)
@@ -31,7 +35,7 @@ fqq <- function(pv, p.m=0.01, p.e=0.01, type="fast"){
     message("Computing lambda >> ", appendLF=FALSE)
     chisq <- qchisq(1-pv,1)
     lambda <- round(median(chisq)/qchisq(0.5,1),2)
-    
+    #lambda <- -99
     message("Subsampling >> ", appendLF=FALSE)
     ## Adapted from https://stats.stackexchange.com/q/357952/53539
     m <- p.m * length(lp$x)
@@ -79,9 +83,14 @@ library(Rmpfr)
 .N <- function(.) mpfr(., precBits = 10)
 
 args <- commandArgs(trailingOnly = TRUE)
+
 p.f = args[1]
-p.m = as.numeric(args[2])
-p.e = as.numeric(args[3])
+#p.m = as.numeric(args[2])
+#p.e = as.numeric(args[3])
+
+p.m = 0.001
+p.e = 0.01
+
 qq.f = paste(p.f, ".qq.png", sep="")
 
 message("Loading data >> ", appendLF=FALSE)
