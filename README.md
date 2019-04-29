@@ -11,7 +11,7 @@ Features:
 
 Usage:
 
-    fqq.R <txt> <p.m> <p.e>
+    plot_fqq.R <txt> <p.m> <p.e>
 
 Where arguments are:
 
@@ -21,7 +21,7 @@ Where arguments are:
 
 Example command:
 
-    fqq.R p.txt 0.001 0.01
+    plot_fqq.R p.txt 0.001 0.01
 
 Example data:
 

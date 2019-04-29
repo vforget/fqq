@@ -1,4 +1,7 @@
-#!/usr/bin/Rscript
+library(data.table)
+library(Rmpfr)
+
+.N <- function(.) mpfr(., precBits = 10)
 
 quant.subsample <- function(x, m=100, e=1){
   ## Adapted from https://stats.stackexchange.com/a/35264/53539
@@ -14,10 +17,8 @@ quant.subsample <- function(x, m=100, e=1){
 }
 
 
-fqq <- function(pv, p.m=0.001, p.e=0.01, type="fast"){
+fqq <- function(pv, p.m=0.001, p.e=0.01, type="subsample"){
 
-    
-    
     message("Cleaning data [", appendLF=FALSE)
     message(length(pv), " > ", appendLF=FALSE)
     pvo <- pv
@@ -40,10 +41,13 @@ fqq <- function(pv, p.m=0.001, p.e=0.01, type="fast"){
     ## Adapted from https://stats.stackexchange.com/q/357952/53539
     m <- p.m * length(lp$x)
     e <- floor(p.e * length(lp$x))
-    if (type=="fast"){
+    if (type=="subsample"){
         xy <- list(x=quant.subsample(lp$x, m, e), y=quant.subsample(lp$y, m, e))
-    }else{
+    }else if (type=="vanilla"){
         xy <- list(x=sort(lp$x), y=sort(lp$y))
+    }else{
+	message("Error: 'type' must be either 'subsample' or 'vanilla'.")
+	quit(status=1)
     }
     message("Confidence intervals >> ", appendLF=FALSE)
     ## Adapted from https://raw.githubusercontent.com/YinLiLin/R-MVP/master/R/MVP.Report.r
@@ -76,25 +80,3 @@ fqq <- function(pv, p.m=0.001, p.e=0.01, type="fast"){
                         as.expression(bquote(N == .(length(y))))),
            bty='n')
 }
-
-library(data.table)
-library(Rmpfr)
-
-.N <- function(.) mpfr(., precBits = 10)
-
-args <- commandArgs(trailingOnly = TRUE)
-
-p.f = args[1]
-p.m = as.numeric(args[2])
-p.e = as.numeric(args[3])
-
-qq.f = paste(p.f, ".qq.png", sep="")
-
-message("Loading data >> ", appendLF=FALSE)
-DT <- fread(p.f, header=TRUE)
-
-png(file=qq.f, res=300, height = 2000, width = 2000)
-fqq(DT$P, p.m=p.m, p.e=p.e)
-invisible(dev.off())
-
-message("Done.")
